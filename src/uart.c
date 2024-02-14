@@ -15,19 +15,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
 
-#ifndef _OS1_TYPES_H_
-#define _OS1_TYPES_H_
+#include <uart.h>
 
-#define NULL                (void*)0
+void _uart_init() {
+    // disable interrupts
+    UART_WRITE_REG(IER, 0x00);
 
-typedef unsigned long int   uint64_t;
-typedef unsigned int        uint32_t;
-typedef unsigned short int  uint16_t;
-typedef unsigned char       uint8_t;
+    // set baud rate
+    UART_WRITE_REG(LCR, LCR_BAUD_LATCH);
+    UART_WRITE_REG(0, 0x03);
+    UART_WRITE_REG(1, 0x00);
 
-typedef signed long int     int64_t;
-typedef signed int          int32_t;
-typedef signed short int    int16_t;
-typedef signed char         int8_t;
+    // set word length to 8 bits
+    UART_WRITE_REG(LCR, LCR_EIGHT_BITS);
 
-#endif//_OS1_TYPES_H_
+    // reset and enable FIFO
+    UART_WRITE_REG(FCR, FCR_FIFO_ENABLE | FCR_FIFO_CLEAR);
+
+    // enable transmit and receive interrupts
+    UART_WRITE_REG(IER, IER_TX_ENABLE | IER_RX_ENABLE);
+}
+
+void _uart_putc(char c) {
+    while((UART_READ_REG(LSR) & LSR_TX_IDLE) == 0);
+    UART_WRITE_REG(THR, c);
+}
+
+char _uart_getc() {
+    return -1;
+}

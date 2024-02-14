@@ -15,19 +15,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
 
-#ifndef _OS1_TYPES_H_
-#define _OS1_TYPES_H_
+#ifndef _OS1_CLINT_H_
+#define _OS1_CLINT_H_
 
-#define NULL                (void*)0
+#include <memlayout.h>
 
-typedef unsigned long int   uint64_t;
-typedef unsigned int        uint32_t;
-typedef unsigned short int  uint16_t;
-typedef unsigned char       uint8_t;
+#define CLINT_MTIME             (CLINT + 0xbff8)
+#define CLINT_MTIMECMP(hartid)  (CLINT + 0x4000 + 8*(hartid))
 
-typedef signed long int     int64_t;
-typedef signed int          int32_t;
-typedef signed short int    int16_t;
-typedef signed char         int8_t;
-
-#endif//_OS1_TYPES_H_
+#endif//_OS1_CLINT_H_

@@ -15,19 +15,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
 
-#ifndef _OS1_TYPES_H_
-#define _OS1_TYPES_H_
+#ifndef _OS1_HART_H_
+#define _OS1_HART_H_
 
-#define NULL                (void*)0
+#include <context.h>
+#include <types.h>
 
-typedef unsigned long int   uint64_t;
-typedef unsigned int        uint32_t;
-typedef unsigned short int  uint16_t;
-typedef unsigned char       uint8_t;
+#define _HART ((struct hart*)r_sscratch())
 
-typedef signed long int     int64_t;
-typedef signed int          int32_t;
-typedef signed short int    int16_t;
-typedef signed char         int8_t;
+typedef struct hart {
+    struct context      context;
 
-#endif//_OS1_TYPES_H_
+    struct proc*        proc;
+
+    uint16_t            noff;
+    uint8_t             intena;
+
+    uint8_t             id;
+} hart_t;
+
+#endif//_OS1_HART_H_

@@ -15,19 +15,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
 
-#ifndef _OS1_TYPES_H_
-#define _OS1_TYPES_H_
+#include <spinlock.h>
+#include <hart.h>
+#include <riscv.h>
 
-#define NULL                (void*)0
 
-typedef unsigned long int   uint64_t;
-typedef unsigned int        uint32_t;
-typedef unsigned short int  uint16_t;
-typedef unsigned char       uint8_t;
+static void __push_off() {
+    int intena = intr_get();
 
-typedef signed long int     int64_t;
-typedef signed int          int32_t;
-typedef signed short int    int16_t;
-typedef signed char         int8_t;
+    intr_off();
+    if(_HART->noff == 0) _HART->intena = intena;
+    _HART->noff += 1;
+}
 
-#endif//_OS1_TYPES_H_
+static void __pop_off() {
+    _HART->noff -= 1;
+    if(_HART->noff == 0 && _HART->intena) intr_on();
+}
+
+void _lock_init(struct spinlock* lk, char* name) {
+    lk->locked = 0;
+    lk->name = name;
+    lk->hart = _HART;
+}
+
+void _lock_acquire(struct spinlock* lk) {
+    __push_off();
+    while(__sync_lock_test_and_set(&lk->locked, 1) != 0);
+    __sync_synchronize();
+    lk->hart = _HART;
+}
+
+void _lock_release(struct spinlock* lk) {
+    lk->hart = NULL;
+    __sync_synchronize();
+    __sync_lock_release(&lk->locked);
+    __pop_off();
+}

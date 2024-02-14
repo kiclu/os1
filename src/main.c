@@ -15,6 +15,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
 
-void _main() {
+#include <trap.h>
+#include <types.h>
+#include <uart.h>
+#include <riscv.h>
+#include <printf.h>
+#include <hart.h>
 
+volatile static int hart0_init_done = 0;
+
+void _main() {
+    if(_HART->id == 0) {
+        _uart_init();
+        _kinfo("os1 kernel booting...\n");
+        _kinfo("HART 0: starting...\n");
+        _trap_init();
+
+        hart0_init_done = 1;
+    }
+    else {
+        while(!hart0_init_done);
+        _kinfo("HART 1: starting...\n");
+        _trap_init_hart();
+    }
+
+    for(;;);
 }

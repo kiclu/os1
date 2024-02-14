@@ -15,19 +15,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
 
-#ifndef _OS1_TYPES_H_
-#define _OS1_TYPES_H_
+#include <hart.h>
 
-#define NULL                (void*)0
-
-typedef unsigned long int   uint64_t;
-typedef unsigned int        uint32_t;
-typedef unsigned short int  uint16_t;
-typedef unsigned char       uint8_t;
-
-typedef signed long int     int64_t;
-typedef signed int          int32_t;
-typedef signed short int    int16_t;
-typedef signed char         int8_t;
-
-#endif//_OS1_TYPES_H_
+struct hart _hart[NCPU];

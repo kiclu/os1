@@ -15,19 +15,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
 
-#ifndef _OS1_TYPES_H_
-#define _OS1_TYPES_H_
+#ifndef _OS1_UART_H_
+#define _OS1_UART_H_
 
-#define NULL                (void*)0
+#include <memlayout.h>
+#include <types.h>
 
-typedef unsigned long int   uint64_t;
-typedef unsigned int        uint32_t;
-typedef unsigned short int  uint16_t;
-typedef unsigned char       uint8_t;
+#define UART_REG(idx) ((volatile uint8_t*)(UART0 + idx))
 
-typedef signed long int     int64_t;
-typedef signed int          int32_t;
-typedef signed short int    int16_t;
-typedef signed char         int8_t;
+#define RHR 0
+#define THR 0
+#define IER 1
+#define FCR 2
+#define ISR 2
+#define LCR 3
+#define LSR 5
 
-#endif//_OS1_TYPES_H_
+#define IER_RX_ENABLE   (1 << 0)
+#define IER_TX_ENABLE   (1 << 1)
+
+#define FCR_FIFO_ENABLE (1 << 0)
+#define FCR_FIFO_CLEAR  (3 << 1)
+
+#define LCR_EIGHT_BITS  (3 << 0)
+#define LCR_BAUD_LATCH  (1 << 7)
+
+#define LSR_RX_READY    (1 << 0)
+#define LSR_TX_IDLE     (1 << 5)
+
+#define UART_READ_REG(idx)      (*(UART_REG(idx)))
+#define UART_WRITE_REG(idx, v)  (*(UART_REG(idx)) = (v))
+
+#define IART_TX_BUF_SIZE 32
+
+void    _uart_init();
+
+void    _uart_putc(char);
+char    _uart_getc();
+
+#endif//_OS1_UART_H_

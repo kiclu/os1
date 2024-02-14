@@ -15,19 +15,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
 
-#ifndef _OS1_TYPES_H_
-#define _OS1_TYPES_H_
+#include <uart.h>
 
-#define NULL                (void*)0
+static void _uart_putstr(const char* str) {
+    for(const char* i = str; *i; ++i) _uart_putc(*i);
+}
 
-typedef unsigned long int   uint64_t;
-typedef unsigned int        uint32_t;
-typedef unsigned short int  uint16_t;
-typedef unsigned char       uint8_t;
+#include <spinlock.h>
 
-typedef signed long int     int64_t;
-typedef signed int          int32_t;
-typedef signed short int    int16_t;
-typedef signed char         int8_t;
+static struct spinlock printf_lk;
 
-#endif//_OS1_TYPES_H_
+void _printf_lock_init() {
+    _lock_init(&printf_lk, "printf_lk");
+}
+
+void _kinfo(const char* str) {
+    _lock_acquire(&printf_lk);
+    _uart_putstr("[INFO]: ");
+    _uart_putstr(str);
+    _lock_release(&printf_lk);
+}
+
+void _kwarn(const char* str) {
+    _lock_acquire(&printf_lk);
+    _uart_putstr("[WARNING]: ");
+    _uart_putstr(str);
+    _lock_release(&printf_lk);
+}
+
+void _kerr(const char* str) {
+    _lock_acquire(&printf_lk);
+    _uart_putstr("[ERROR]: ");
+    _uart_putstr(str);
+    _lock_release(&printf_lk);
+}

@@ -15,19 +15,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-.global _entry
+.global _timervec
+.align 4
 
-.section .text.entry
-_entry:
-    # read mhartid
-    csrr    a0, mhartid
-    add     a0, a0, 1
+_timervec:
+    # save context
+    csrrw   a0, mscratch, a0
+    sd      a1,  0(a0)
+    sd      a2,  8(a0)
+    sd      a3, 16(a0)
 
-    # initialize stack pointer
-    la      sp, kernel_stack_section_start
-    #la      a1, kernel_stack_size
-    la      a1, 4096
-    mul     a0, a0, a1
-    add     sp, sp, a0
+    # schedule next interrupt
+    ld      a1, 24(a0)
+    ld      a2, 32(a0)
+    ld      a3,  0(a1)
+    add     a3, a3, a2
+    sd      a3,  0(a1)
 
-    j       _start
+    # arrange a supervisor timer interrupt
+    csrs    sip, 2
+
+    # restore context
+    ld      a3, 16(a0)
+    ld      a2, 8(a0)
+    ld      a1, 0(a0)
+    csrrw   a0, mscratch, a0
+
+    # return
+    mret

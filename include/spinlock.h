@@ -15,19 +15,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
 
-#ifndef _OS1_TYPES_H_
-#define _OS1_TYPES_H_
+#ifndef _OS1_SPINLOCK_H_
+#define _OS1_SPINLOCK_H_
 
-#define NULL                (void*)0
+#include <types.h>
 
-typedef unsigned long int   uint64_t;
-typedef unsigned int        uint32_t;
-typedef unsigned short int  uint16_t;
-typedef unsigned char       uint8_t;
+typedef struct spinlock {
+    uint8_t locked;
 
-typedef signed long int     int64_t;
-typedef signed int          int32_t;
-typedef signed short int    int16_t;
-typedef signed char         int8_t;
+    char* name;
+    struct hart* hart;
+} spinlock_t;
 
-#endif//_OS1_TYPES_H_
+void    _lock_init(struct spinlock*, char*);
+void    _lock_acquire(struct spinlock*);
+void    _lock_release(struct spinlock*);
+
+#endif//_OS1_SPINLOCK_H_

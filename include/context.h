@@ -15,19 +15,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
 
-#ifndef _OS1_TYPES_H_
-#define _OS1_TYPES_H_
+#ifndef _OS1_CONTEXT_H_
+#define _OS1_CONTEXT_H_
 
-#define NULL                (void*)0
+#include <types.h>
 
-typedef unsigned long int   uint64_t;
-typedef unsigned int        uint32_t;
-typedef unsigned short int  uint16_t;
-typedef unsigned char       uint8_t;
+typedef struct reg {
+    uint64_t    ra;
+    uint64_t    sp;
+    uint64_t    gp;
+    uint64_t    tp;
+    uint64_t    t0;
+    uint64_t    t1;
+    uint64_t    t2;
+    uint64_t    s0;
+    uint64_t    s1;
+    uint64_t    a0;
+    uint64_t    a1;
+    uint64_t    a2;
+    uint64_t    a3;
+    uint64_t    a4;
+    uint64_t    a5;
+    uint64_t    a6;
+    uint64_t    a7;
+    uint64_t    s2;
+    uint64_t    s3;
+    uint64_t    s4;
+    uint64_t    s5;
+    uint64_t    s6;
+    uint64_t    s7;
+    uint64_t    s8;
+    uint64_t    s9;
+    uint64_t    s10;
+    uint64_t    s11;
+    uint64_t    t3;
+    uint64_t    t4;
+    uint64_t    t5;
+    uint64_t    t6;
+} reg_t;
 
-typedef signed long int     int64_t;
-typedef signed int          int32_t;
-typedef signed short int    int16_t;
-typedef signed char         int8_t;
+typedef struct context {
+    struct reg  reg;
+    uint64_t    pc;
+} context_t;
 
-#endif//_OS1_TYPES_H_
+#endif//_OS1_CONTEXT_H_

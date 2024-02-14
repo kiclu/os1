@@ -15,12 +15,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
 
+#include <clint.h>
+#include <hart.h>
 #include <riscv.h>
 #include <types.h>
 
 extern void _main();
+extern void _timervec();
 
-__attribute__((noreturn))
+uint64_t mt_scratch[NCPU][5];
+
+void _timer_init() {
+    uint64_t hartid = r_mhartid();
+
+    uint64_t interval = 1000000;
+    uint64_t mtime = *(uint64_t*)CLINT_MTIME;
+    uint64_t mtimecmp = mtime + interval;
+    *(uint64_t*)CLINT_MTIMECMP(hartid) = mtimecmp;
+
+    mt_scratch[hartid][3] = CLINT_MTIMECMP(hartid);
+    mt_scratch[hartid][4] = interval;
+    w_mscratch((uint64_t)&mt_scratch[hartid][0]);
+
+    w_mtvec((uint64_t)_timervec);
+    w_mstatus(r_mstatus() | MSTATUS_MIE);
+    w_mie(r_mie() | MIE_MTIE);
+}
+
+extern struct hart _hart[NCPU];
+
 void _start() {
+    uint64_t mstatus = r_mstatus();
+    mstatus &= ~MSTATUS_MPP_MASK;
+    mstatus |= MSTATUS_MPP_S;
+    w_mstatus(mstatus);
 
+    w_mepc((uint64_t)_main);
+
+    w_medeleg(0xffff);
+    w_mideleg(0xffff);
+
+    w_pmpaddr0(0x3fffffffffffffull);
+    w_pmpcfg0(0xf);
+
+    _timer_init();
+
+    _hart[r_mhartid()].id = r_mhartid();
+    w_sscratch((uint64_t)&_hart[r_mhartid()]);
+
+    asm volatile("mret");
 }
