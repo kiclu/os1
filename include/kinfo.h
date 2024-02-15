@@ -28,4 +28,6 @@
 
 #define KINFO_TARGET(m)             _printk("[  \x1b[32mOK\x1b[0m  ] Reached target \x1b[1m" m "\x1b[0m.\n");
 
+#define KINFO_PANIC(m)              _printk("[ \x1b[31mPANIC\x1b[0m ] %s!\n", m);
+
 #endif//_OS1_KINFO_H_

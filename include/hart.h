@@ -21,7 +21,10 @@
 #include <context.h>
 #include <types.h>
 
-#define _HART ((struct hart*)r_sscratch())
+#define HART    ((struct hart*)r_sscratch())
+#define CONTEXT ((struct hart*)r_sscratch())->context
+#define PROC    ((struct hart*)r_sscratch())->proc
+#define HARTID  ((struct hart*)r_sscratch())->id
 
 typedef struct hart {
     struct context      context;

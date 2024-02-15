@@ -26,16 +26,20 @@
 static volatile int hart0_init_done = 0;
 
 void _main() {
-    if(_HART->id == 0) {
+    if(HARTID == 0) {
         _uart_init();
         _printk_lock_init();
         _printk("OS1 kernel booting...\n");
+
         _trap_init();
+
         KINFO_TARGET("ksvinit.target");
+        __sync_synchronize();
         hart0_init_done = 1;
     }
     else {
         while(!hart0_init_done);
+        __sync_synchronize();
         _trap_init_hart();
     }
 
