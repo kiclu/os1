@@ -19,9 +19,7 @@
 #define _OS1_MEMLAYOUT_H_
 
 #define CLINT       0x02000000L
-
 #define PLIC        0x0c000000L
-
 #define UART0       0x10000000L
 
 #endif//_OS1_MEMLAYOUT_H_

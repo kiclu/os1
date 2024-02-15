@@ -111,6 +111,8 @@ void        w_pmpcfg0(uint64_t);
 uint64_t    r_pmpaddr0();
 void        w_pmpaddr0(uint64_t);
 
+// ...
+
 uint64_t    r_sstatus();
 void        w_sstatus(uint64_t);
 

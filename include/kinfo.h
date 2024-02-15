@@ -15,11 +15,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
 
-#ifndef _OS1_PRINTF_H_
-#define _OS1_PRINTF_H_
+#ifndef _OS1_KINFO_H_
+#define _OS1_KINFO_H_
 
-void    _kinfo(const char*);
-void    _kwarn(const char*);
-void    _kerr(const char*);
+#include <printk.h>
 
-#endif//_OS1_PRINTF_H_
+#define KINFO_STARTING(m)           _printk("         Starting \x1b[1m" m "\x1b[0m...\n");
+#define KINFO_STARTING_I(m, i0)     _printk("         Starting \x1b[1m" m "\x1b[0m...\n", i0);
+
+#define KINFO_STARTED(m)            _printk("[  \x1b[32mOK\x1b[0m  ] Started \x1b[1m" m "\x1b[0m.\n");
+#define KINFO_STARTED_I(m, i0)      _printk("[  \x1b[32mOK\x1b[0m  ] Started \x1b[1m" m "\x1b[0m.\n", i0);
+
+#define KINFO_TARGET(m)             _printk("[  \x1b[32mOK\x1b[0m  ] Reached target \x1b[1m" m "\x1b[0m.\n");
+
+#endif//_OS1_KINFO_H_

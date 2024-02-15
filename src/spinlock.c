@@ -16,9 +16,9 @@
  * SOFTWARE. */
 
 #include <spinlock.h>
+
 #include <hart.h>
 #include <riscv.h>
-
 
 static void __push_off() {
     int intena = intr_get();

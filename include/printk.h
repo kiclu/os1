@@ -15,37 +15,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
 
-#include <uart.h>
+#ifndef _OS1_PRINTK_H_
+#define _OS1_PRINTK_H_
 
-static void _uart_putstr(const char* str) {
-    for(const char* i = str; *i; ++i) _uart_putc(*i);
-}
+void    _printk_lock_init();
+void    _printk(const char*, ...);
 
-#include <spinlock.h>
-
-static struct spinlock printf_lk;
-
-void _printf_lock_init() {
-    _lock_init(&printf_lk, "printf_lk");
-}
-
-void _kinfo(const char* str) {
-    _lock_acquire(&printf_lk);
-    _uart_putstr("[INFO]: ");
-    _uart_putstr(str);
-    _lock_release(&printf_lk);
-}
-
-void _kwarn(const char* str) {
-    _lock_acquire(&printf_lk);
-    _uart_putstr("[WARNING]: ");
-    _uart_putstr(str);
-    _lock_release(&printf_lk);
-}
-
-void _kerr(const char* str) {
-    _lock_acquire(&printf_lk);
-    _uart_putstr("[ERROR]: ");
-    _uart_putstr(str);
-    _lock_release(&printf_lk);
-}
+#endif//_OS1_PRINTK_H_

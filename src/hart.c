@@ -17,4 +17,4 @@
 
 #include <hart.h>
 
-struct hart _hart[NCPU];
+struct hart _hart[NHART];

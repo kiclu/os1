@@ -23,7 +23,7 @@
 extern void _main();
 extern void _timervec();
 
-uint64_t mt_scratch[NCPU][5];
+uint64_t mt_scratch[NHART][5];
 
 void _timer_init() {
     uint64_t hartid = r_mhartid();
@@ -42,7 +42,7 @@ void _timer_init() {
     w_mie(r_mie() | MIE_MTIE);
 }
 
-extern struct hart _hart[NCPU];
+extern struct hart _hart[NHART];
 
 void _start() {
     uint64_t mstatus = r_mstatus();

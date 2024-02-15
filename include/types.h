@@ -30,4 +30,6 @@ typedef signed int          int32_t;
 typedef signed short int    int16_t;
 typedef signed char         int8_t;
 
+typedef unsigned long int   size_t;
+
 #endif//_OS1_TYPES_H_

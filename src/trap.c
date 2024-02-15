@@ -17,6 +17,9 @@
 
 #include <riscv.h>
 
+#include <hart.h>
+#include <kinfo.h>
+
 #define I (1UL << 63)
 
 #define SSI 1
@@ -27,9 +30,11 @@ extern void _user_trap_vec();
 extern void _kernel_trap_vec();
 
 void _trap_init() {
+    KINFO_STARTING("intr.service");
     w_stvec((uint64_t)_user_trap_vec);
     w_sie(r_sie() | SIE_SEIE | SIE_STIE | SIE_SSIE);
     w_sstatus(r_sstatus() | SSTATUS_SIE);
+    KINFO_STARTED("intr.service");
 }
 
 void _trap_init_hart() {
@@ -38,19 +43,10 @@ void _trap_init_hart() {
     w_sstatus(r_sstatus() | SSTATUS_SIE);
 }
 
-#include <printf.h>
-#include <hart.h>
-
 static int _intr_handler() {
     uint64_t scause = r_scause();
     switch(scause & 0xff) {
         case SSI: {
-
-            struct hart* hart = (struct hart*)r_sscratch();
-            switch(hart->id) {
-                case 0: _kinfo("HART 0: timer interrupt\n"); break;
-                case 1: _kinfo("HART 1: timer interrupt\n"); break;
-            }
 
             w_sip(r_sip() & ~SIP_SSIP);
             return SSI;

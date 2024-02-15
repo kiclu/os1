@@ -302,9 +302,3 @@ r_satp:
 w_satp:
     csrw    satp, a0
     ret
-
-#.global intr_get
-#    csrr    a0, sstatus
-#    sll     a0, a0, 62
-#    srl     a0, a0, 63
-#    ret

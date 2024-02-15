@@ -5,7 +5,7 @@ DIR_BUILD 	= build
 KERNEL_IMG = kernel
 KERNEL_ASM = kernel.asm
 
-CPU_CORE_COUNT = 2
+CPU_CORE_COUNT = 16
 
 TOOLPREFIX	= riscv64-unknown-elf-
 
@@ -24,7 +24,7 @@ CFLAGS += -I${DIR_INC}
 CFLAGS += -O3
 CFLAGS += -nostdlib
 CFLAGS += -march=rv64g -mabi=lp64 -mcmodel=medany -mno-relax
-CFLAGS += -DNCPU=${CPU_CORE_COUNT}
+CFLAGS += -DNHART=${CPU_CORE_COUNT}
 CFLAGS += -fno-omit-frame-pointer -ffreestanding -fno-common
 
 LDSCRIPT = kernel.ld
@@ -61,4 +61,4 @@ clean:
 QEMUOPTS = -machine virt -bios none -kernel ${KERNEL_IMG} -m 128M -smp ${CPU_CORE_COUNT} -nographic
 
 qemu: ${KERNEL_IMG}
-	${QEMU} ${QEMUOPTS}
+	@${QEMU} ${QEMUOPTS}
