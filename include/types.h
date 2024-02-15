@@ -32,4 +32,13 @@ typedef signed char         int8_t;
 
 typedef unsigned long int   size_t;
 
+
+typedef struct clint_context {
+    uint64_t scratch0;
+    uint64_t scratch1;
+    uint64_t scratch2;
+    uint64_t mtimecmp;
+    uint64_t interval;
+} clint_context_t;
+
 #endif//_OS1_TYPES_H_

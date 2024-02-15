@@ -20,11 +20,11 @@
 #include <hart.h>
 #include <kinfo.h>
 
-#define I (1UL << 63)
+#define I       (1UL << 63)
 
-#define SSI 1
-#define STI 5
-#define SEI 9
+#define SSI     1
+#define STI     5
+#define SEI     9
 
 #define INSN_ADDRESS_MISALIGNED     0
 #define INSN_ACCESS_FAULT           1
@@ -41,8 +41,14 @@
 #define LD_PG_FAULT                 13
 #define ST_PG_FAULT                 15
 
-extern void _user_trap_vec();
-extern void _kernel_trap_vec();
+extern void     _user_trap_vec();
+extern void     _kernel_trap_vec();
+
+static int      _intr_handler();
+static void     _user_trap_ret();
+static void     _syscall();
+
+static void     _panic();
 
 void _trap_init() {
     KINFO_STARTING("intr.service");
@@ -58,7 +64,9 @@ void _trap_init_hart() {
     w_sstatus(r_sstatus() | SSTATUS_SIE);
 }
 
-static int _intr_handler() {
+#include <printk.h>
+
+int _intr_handler() {
     uint64_t scause = r_scause();
     if(!(scause & I)) return scause;
     switch(scause & 0xff) {
@@ -79,16 +87,6 @@ static int _intr_handler() {
         }
     }
     return scause;
-}
-
-static void _panic(const char* cause) {
-    KINFO_PANIC(cause);
-    for(;;);
-}
-
-static void _user_trap_ret() {
-    //intr_off();
-    w_stvec((uint64_t)_user_trap_vec);
 }
 
 void _user_trap_handler() {
@@ -132,7 +130,7 @@ void _user_trap_handler() {
             } break;
 
             case ECALL_U: {
-                _panic("ECALL_U");
+                _syscall();
             } break;
 
             case ECALL_S: {
@@ -163,4 +161,29 @@ void _user_trap_handler() {
     }
 
     _user_trap_ret();
+}
+
+void _user_trap_ret() {
+    intr_off();
+    w_stvec((uint64_t)_user_trap_vec);
+}
+
+void _syscall() {
+    uint64_t code = CONTEXT.reg.a0;
+    //uint64_t arg0 = CONTEXT.reg.a1;
+    //uint64_t arg1 = CONTEXT.reg.a2;
+    //uint64_t arg2 = CONTEXT.reg.a3;
+    //uint64_t arg3 = CONTEXT.reg.a4;
+    //uint64_t arg4 = CONTEXT.reg.a5;
+    //uint64_t arg5 = CONTEXT.reg.a6;
+    //uint64_t arg6 = CONTEXT.reg.a7;
+
+    switch(code) {
+
+    }
+}
+
+void _panic(const char* cause) {
+    KINFO_PANIC(cause);
+    for(;;);
 }

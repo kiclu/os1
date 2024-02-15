@@ -5,7 +5,7 @@ DIR_BUILD 	= build
 KERNEL_IMG = kernel
 KERNEL_ASM = kernel.asm
 
-CPU_CORE_COUNT = 16
+CPU_CORE_COUNT = 4
 
 TOOLPREFIX	= riscv64-unknown-elf-
 

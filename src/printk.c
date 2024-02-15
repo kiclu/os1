@@ -23,59 +23,16 @@
 
 static struct spinlock printk_lk;
 
+static void     _printk_int32(int32_t);
+static void     _printk_uint_b10(uint64_t);
+static void     _printk_uint_b16_lc(uint64_t);
+static void     _printk_uint_b16_uc(uint64_t);
+static void     _printk_char(char);
+static void     _printk_str(const char*);
+static void     _printk_ptr(uint64_t);
+
 void _printk_lock_init() {
     _lock_init(&printk_lk, "printk_lk");
-}
-
-static const char digits_lowercase[] = "0123456789abcdef";
-static const char digits_uppercase[] = "0123456789ABCDEF";
-
-static void _printk_int32(int32_t x) {
-
-}
-
-static void _printk_uint_b10(uint64_t x) {
-    if(x == 0) { _uart_putc('0'); return; }
-
-    uint8_t buf[32];
-    int i;
-
-    for(i = 0; x > 0; x /= 10) buf[i++] = '0' + x % 10;
-
-    while(i > 0) _uart_putc(buf[--i]);
-}
-
-static void _printk_uint_b16_lc(uint64_t x) {
-    if(x == 0) { _uart_putc('0'); return; }
-
-    uint8_t buf[32];
-    int i;
-
-    for(i = 0; x > 0; x >>= 4) buf[i++] = x & 0xf;
-
-    while(i > 0) _uart_putc(digits_lowercase[buf[--i]]);
-}
-
-static void _printk_uint_b16_uc(uint64_t x) {
-    if(x == 0) { _uart_putc('0'); return; }
-
-    uint8_t buf[32];
-    size_t i;
-
-    for(i = 0; x > 0; x >>= 4) buf[i++] = x & 0xf;
-
-    while(i > 0) _uart_putc(digits_uppercase[buf[--i]]);
-}
-
-void _printk_char(char c) { _uart_putc(c); }
-
-void _printk_str(const char* p) {
-    while(*p) _uart_putc(*p++);
-}
-
-void _printk_ptr(uint64_t ptr) {
-    _printk_str("0x");
-    _printk_uint_b16_lc(ptr);
 }
 
 void _printk(const char* fmt, ...) {
@@ -102,4 +59,55 @@ void _printk(const char* fmt, ...) {
         }
     }
     _lock_release(&printk_lk);
+}
+
+static const char digits_lowercase[] = "0123456789abcdef";
+static const char digits_uppercase[] = "0123456789ABCDEF";
+
+void _printk_int32(int32_t x) {
+
+}
+
+void _printk_uint_b10(uint64_t x) {
+    if(x == 0) { _uart_putc('0'); return; }
+
+    uint8_t buf[32];
+    int i;
+
+    for(i = 0; x > 0; x /= 10) buf[i++] = '0' + x % 10;
+
+    while(i > 0) _uart_putc(buf[--i]);
+}
+
+void _printk_uint_b16_lc(uint64_t x) {
+    if(x == 0) { _uart_putc('0'); return; }
+
+    uint8_t buf[32];
+    int i;
+
+    for(i = 0; x > 0; x >>= 4) buf[i++] = x & 0xf;
+
+    while(i > 0) _uart_putc(digits_lowercase[buf[--i]]);
+}
+
+void _printk_uint_b16_uc(uint64_t x) {
+    if(x == 0) { _uart_putc('0'); return; }
+
+    uint8_t buf[32];
+    size_t i;
+
+    for(i = 0; x > 0; x >>= 4) buf[i++] = x & 0xf;
+
+    while(i > 0) _uart_putc(digits_uppercase[buf[--i]]);
+}
+
+void _printk_char(char c) { _uart_putc(c); }
+
+void _printk_str(const char* p) {
+    while(*p) _uart_putc(*p++);
+}
+
+void _printk_ptr(uint64_t ptr) {
+    _printk_str("0x");
+    _printk_uint_b16_lc(ptr);
 }

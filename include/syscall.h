@@ -15,43 +15,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
 
-#include <spinlock.h>
+#ifndef _OS1_SYSCALL_H_
+#define _OS1_SYSCALL_H_
 
-#include <hart.h>
-#include <riscv.h>
+#include <types.h>
 
-static void     __push_off();
-static void     __pop_off();
+uint64_t    syscall(uint64_t code, ...);
 
-void _lock_init(struct spinlock* lk, char* name) {
-    lk->locked = 0;
-    lk->name = name;
-    lk->hart = HART;
-}
+void        _umode();
 
-void _lock_acquire(struct spinlock* lk) {
-    __push_off();
-    while(__sync_lock_test_and_set(&lk->locked, 1) != 0);
-    __sync_synchronize();
-    lk->hart = HART;
-}
+void*       malloc(size_t);
+void        free(void*);
 
-void _lock_release(struct spinlock* lk) {
-    lk->hart = NULL;
-    __sync_synchronize();
-    __sync_lock_release(&lk->locked);
-    __pop_off();
-}
-
-void __push_off() {
-    int intena = intr_get();
-
-    intr_off();
-    if(HART->noff == 0) HART->intena = intena;
-    HART->noff += 1;
-}
-
-void __pop_off() {
-    HART->noff -= 1;
-    if(HART->noff == 0 && HART->intena) intr_on();
-}
+#endif//_OS1_SYSCALL_H_

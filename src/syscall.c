@@ -15,43 +15,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE. */
 
-#include <spinlock.h>
+#include <syscall.h>
 
-#include <hart.h>
-#include <riscv.h>
-
-static void     __push_off();
-static void     __pop_off();
-
-void _lock_init(struct spinlock* lk, char* name) {
-    lk->locked = 0;
-    lk->name = name;
-    lk->hart = HART;
+uint64_t syscall(uint64_t code, ...) {
+    uint64_t ret;
+    asm volatile("ecall; mv %0, a0" : "=r"(ret));
+    return ret;
 }
 
-void _lock_acquire(struct spinlock* lk) {
-    __push_off();
-    while(__sync_lock_test_and_set(&lk->locked, 1) != 0);
-    __sync_synchronize();
-    lk->hart = HART;
+void _umode() { syscall(0x00); }
+
+void* malloc(size_t size) {
+    return (void*)syscall(0x10, size);
 }
 
-void _lock_release(struct spinlock* lk) {
-    lk->hart = NULL;
-    __sync_synchronize();
-    __sync_lock_release(&lk->locked);
-    __pop_off();
-}
-
-void __push_off() {
-    int intena = intr_get();
-
-    intr_off();
-    if(HART->noff == 0) HART->intena = intena;
-    HART->noff += 1;
-}
-
-void __pop_off() {
-    HART->noff -= 1;
-    if(HART->noff == 0 && HART->intena) intr_on();
+void free(void* ptr) {
+    syscall(0x11, ptr);
 }

@@ -19,6 +19,7 @@
 #include <kinfo.h>
 #include <printk.h>
 #include <riscv.h>
+#include <syscall.h>
 #include <trap.h>
 #include <types.h>
 #include <uart.h>
@@ -29,7 +30,7 @@ void _main() {
     if(HARTID == 0) {
         _uart_init();
         _printk_lock_init();
-        _printk("OS1 kernel booting...\n");
+        _printk("os1 kernel booting...\n");
 
         _trap_init();
 
@@ -42,6 +43,8 @@ void _main() {
         __sync_synchronize();
         _trap_init_hart();
     }
+
+    _umode();
 
     for(;;);
 }

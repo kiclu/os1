@@ -20,27 +20,9 @@
 #include <riscv.h>
 #include <types.h>
 
-extern void _main();
-extern void _timervec();
-
-uint64_t mt_scratch[NHART][5];
-
-void _timer_init() {
-    uint64_t hartid = r_mhartid();
-
-    uint64_t interval = 1000000;
-    uint64_t mtime = *(uint64_t*)CLINT_MTIME;
-    uint64_t mtimecmp = mtime + interval;
-    *(uint64_t*)CLINT_MTIMECMP(hartid) = mtimecmp;
-
-    mt_scratch[hartid][3] = CLINT_MTIMECMP(hartid);
-    mt_scratch[hartid][4] = interval;
-    w_mscratch((uint64_t)&mt_scratch[hartid][0]);
-
-    w_mtvec((uint64_t)_timervec);
-    w_mstatus(r_mstatus() | MSTATUS_MIE);
-    w_mie(r_mie() | MIE_MTIE);
-}
+extern void     _main();
+extern void     _timervec();
+static void     _timer_init();
 
 extern struct hart _hart[NHART];
 
@@ -58,10 +40,27 @@ void _start() {
     w_pmpaddr0(0x3fffffffffffffull);
     w_pmpcfg0(0xf);
 
-    _timer_init();
-
     _hart[r_mhartid()].id = r_mhartid();
     w_sscratch((uint64_t)&_hart[r_mhartid()]);
 
+    _timer_init();
+
     asm volatile("mret");
+}
+
+static struct clint_context cc[NHART];
+
+void _timer_init() {
+    uint64_t interval = 1000000;
+    uint64_t mtime = *(uint64_t*)CLINT_MTIME;
+    uint64_t mtimecmp = mtime + interval;
+    *(uint64_t*)CLINT_MTIMECMP(HARTID) = mtimecmp;
+
+    cc[HARTID].mtimecmp = CLINT_MTIMECMP(HARTID);
+    cc[HARTID].interval = interval;
+    w_mscratch((uint64_t)&cc[HARTID]);
+
+    w_mtvec((uint64_t)_timervec);
+    w_mstatus(r_mstatus() | MSTATUS_MIE);
+    w_mie(r_mie() | MIE_MTIE);
 }
